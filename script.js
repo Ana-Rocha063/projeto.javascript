@@ -1,97 +1,195 @@
-const typingText = document.querySelector(".typing-text p"),
+// textoDigitando seleciona o texto que deve ser digitado para interagir com o script
+const textoDigitando = document.querySelector(".typing-text p")
 
-inpField = document.querySelector(".wrapper .input-field"),
-tryAgainBtn = document.querySelector(".content button"),
-timeTag = document.querySelector(".time span b"),
-mistakeTag = document.querySelector(".mistake span"),
-wpmTag = document.querySelector(".wpm span"),
-cpmTag = document.querySelector(".cpm span");
-let timer,
-maxTime = 120,
-timeLeft = maxTime,
-charIndex = mistakes = isTyping = 0;
-//pega um parágrafo de uma lista pré-existente (paragraphs), o divide em letras e coloca cada letra dentro de uma tag <span> para que possa ser facilmente estilizada ou manipulada depois.
-function loadParagraph() {
-    const ranIndex = Math.floor(Math.random() * paragraphs.length);
-    typingText.innerHTML = "";
-    paragraphs[ranIndex].split("").forEach(char => {
-        let span = `<span>${char}</span>`
-        typingText.innerHTML += span;
-    });
-    typingText.querySelectorAll("span")[0].classList.add("active");
-// campo de entrada (inpField) esteja sempre ativo e pronto para receber a digitação, seja através de um clique na área de texto ou de qualquer pressionamento de tecla na página.
-    document.addEventListener("keydown", () => inpField.focus());
-    typingText.addEventListener("click", () => inpField.focus());
+// campoEntrada seleciona o campo onde o texto será escrito para interagir com o script
+const campoEntrada = document.querySelector(".wrapper .input-field")
+
+// Seletores dos elementos visuais de estatísticas
+const botaoTentarNovamente = document.querySelector(".content button")
+
+
+const tempoTag = document.querySelector(".time span b")
+
+
+const errosTag = document.querySelector(".mistake span")
+
+
+const lpmTag = document.querySelector(".wpm span")
+
+
+const cpmTag = document.querySelector(".cpm span")
+
+// Tempo máximo para o jogo (120 segundos)
+const tempoMaximo = 120
+
+// Seleciona um parágrafo aleatório da lista 'paragrafos'
+const obterParagrafoAleatorio = () =>
+  paragrafos[Math.floor(Math.random() * paragrafos.length)]
+
+// Envolve cada caractere com <span>
+const envolverCaracteres = texto =>
+  texto.split("").map(letra => `<span>${letra}</span>`).join("")
+
+// Garante que o campo de digitação esteja sempre focado
+const definirFoco = () => {
+  document.addEventListener("keydown", () => campoEntrada.focus())
+  textoDigitando.addEventListener("click", () => campoEntrada.focus())
 }
-function initTyping() {
-    let characters = typingText.querySelectorAll("span");
-    let typedChar = inpField.value.split("")[charIndex];
-    if(charIndex < characters.length - 1 && timeLeft > 0) {
-        if(!isTyping) {
-//Começado o contador ele não vai reiniciar a cada palavra digitada 
-            timer = setInterval(initTimer, 1000);
-            isTyping = true;
-        }
-//Se o usuário não digitou nada ou apertou o botão de voltar, remove a classe correta 
-//ou incorreta da palavra, e se estiver incorreta, remove os erros
-        if(typedChar == null) {
-            if(charIndex > 0) {
-                charIndex--;
-//somente se a classe do charIndex for incorreta
-                if(characters[charIndex].classList.contains("incorrect")) {
-                    mistakes--;
-                }
-                characters[charIndex].classList.remove("correct", "incorrect");
-            }
-        } else {
-//se o usuário digitar a palavra correspondente, adiciona a class= correto
-            if(characters[charIndex].innerText == typedChar) {
-                characters[charIndex].classList.add("correct");
-//caso contrário adiciona 1 aos erros e muda a classe para incorreto
-            } else {
-                mistakes++;
-                characters[charIndex].classList.add("incorrect");
-            }
-            charIndex++;
-        }
-        characters.forEach(span => span.classList.remove("active"));
-        characters[charIndex].classList.add("active");
-        let wpm = Math.round(((charIndex - mistakes)  / 5) / (maxTime - timeLeft) * 120);
-//Se as palavras por minuto for 0, vazio ou infinito coloca seu valor para 0
-        wpm = wpm < 0 || !wpm || wpm === Infinity ? 0 : wpm;
-        
-        wpmTag.innerText = wpm;
-        mistakeTag.innerText = mistakes;
-        cpmTag.innerText = charIndex - mistakes;
-    } else {
-        clearInterval(timer);
-        inpField.value = "";
-    }   
+
+// Define qual caractere está "ativo"
+const ativarCaractere = (indice = 0) =>
+  Array.from(textoDigitando.querySelectorAll("span")).forEach((span, i) =>
+    span.classList.toggle("active", i === indice)
+  )
+
+// Atualiza LPM, CPM e erros
+const atualizarEstatisticas = (indiceChar, erros, tempoRestante) => {
+  const lpmCalculado = tempoRestante < tempoMaximo
+    ? Math.round(((indiceChar - erros) / 5) / ((tempoMaximo - tempoRestante) / 60))
+    : 0
+
+  const lpm = lpmCalculado > 0 && isFinite(lpmCalculado) ? lpmCalculado : 0
+
+  lpmTag.innerText = lpm
+  errosTag.innerText = erros
+  cpmTag.innerText = indiceChar - erros
 }
-function initTimer() {
-    if(timeLeft > 0) {
-        timeLeft--;
-        timeTag.innerText = timeLeft;
-        //Cálculo das letras por minuto
-        let wpm = Math.round(((charIndex - mistakes)  / 5) / (maxTime - timeLeft) * 120);
-        wpmTag.innerText = wpm;
-    } else {
-        clearInterval(timer);
-    }
+
+// Estado inicial do jogo
+const estadoInicial = () => ({
+  tempoRestante: tempoMaximo,
+  indiceChar: 0,
+  erros: 0,
+  digitando: false
+})
+
+// Encapsulamento funcional do estado
+const estadoJogo = (() => {
+  let estado = estadoInicial()
+  return {
+    obter: () => estado,
+    definir: novo => (estado = { ...estado, ...novo })
+  }
+})()
+
+// Atualiza a barra de vida visualmente
+const atualizarBarraDeVida = tempo => {
+  const porcentagem = (tempo / tempoMaximo) * 100
+  document.querySelector(".vida").style.width = `${porcentagem}%`
 }
-//Reset do jogo, chama a função loadparagrafh e reseta cada 
-//variável e demais elenentos para zero
-function resetGame() {
-    loadParagraph();
-    clearInterval(timer);
-    timeLeft = maxTime;
-    charIndex = mistakes = isTyping = 0;
-    inpField.value = "";
-    timeTag.innerText = timeLeft;
-    wpmTag.innerText = 0;
-    mistakeTag.innerText = 0;
-    cpmTag.innerText = 0;
+
+// Contador de tempo recursivo
+const iniciarContagemRegressiva = () => {
+  const estado = estadoJogo.obter()
+
+  if (estado.tempoRestante > 0) {
+    const novoTempo = estado.tempoRestante - 1
+    estadoJogo.definir({ tempoRestante: novoTempo })
+
+    tempoTag.innerText = novoTempo
+    atualizarEstatisticas(estado.indiceChar, estado.erros, novoTempo)
+    atualizarBarraDeVida(novoTempo)
+
+    setTimeout(iniciarContagemRegressiva, 1000)
+  } else {
+    campoEntrada.value = ""
+    atualizarBarraDeVida(0)
+  }
 }
-loadParagraph();
-inpField.addEventListener("input", initTyping);
-tryAgainBtn.addEventListener("click", resetGame);
+
+// Aplica estilo correto/incorreto
+const atualizarClasses = (indice, letraDigitada, caracteres) => {
+  const caractereAtual = caracteres[indice]
+  const correto = caractereAtual?.innerText === letraDigitada
+
+  caractereAtual?.classList.remove("correct", "incorrect")
+  caractereAtual?.classList.add(correto ? "correct" : "incorrect")
+
+  return correto ? 0 : 1
+}
+
+// Lida com backspace
+const tratarBackspace = (estado, caracteres) => {
+  const indiceAnterior = estado.indiceChar - 1
+  const anterior = caracteres[indiceAnterior]
+
+  if (!anterior) return { ...estado }
+
+  const estavaErrado = anterior.classList.contains("incorrect")
+
+  anterior.classList.remove("correct", "incorrect")
+
+  return {
+    ...estado,
+    indiceChar: indiceAnterior,
+    erros: estado.erros - (estavaErrado ? 1 : 0)
+  }
+}
+
+// Quando digita algo
+const iniciarDigitacao = () => {
+  const caracteres = Array.from(textoDigitando.querySelectorAll("span"))
+  const estado = estadoJogo.obter()
+  const letraDigitada = campoEntrada.value.charAt(estado.indiceChar)
+
+  if (!estado.digitando) {
+    estadoJogo.definir({ digitando: true })
+    iniciarContagemRegressiva()
+  }
+
+  if (!letraDigitada) {
+    const novoEstado = tratarBackspace(estado, caracteres)
+    estadoJogo.definir(novoEstado)
+  } else {
+    const novosErros = estado.erros + atualizarClasses(estado.indiceChar, letraDigitada, caracteres)
+    const novoIndice = estado.indiceChar + 1
+    estadoJogo.definir({ indiceChar: novoIndice, erros: novosErros })
+  }
+
+  const novoEstado = estadoJogo.obter()
+
+  ativarCaractere(novoEstado.indiceChar)
+  atualizarEstatisticas(novoEstado.indiceChar, novoEstado.erros, novoEstado.tempoRestante)
+
+  // Se a frase acabou
+  if (novoEstado.indiceChar >= caracteres.length) {
+    const tempoExtra = Math.min(novoEstado.tempoRestante + 5, tempoMaximo)
+
+    estadoJogo.definir({
+      ...estadoInicial(),
+      tempoRestante: tempoExtra,
+      digitando: true
+    })
+
+    campoEntrada.value = ""
+    tempoTag.innerText = tempoExtra
+    atualizarBarraDeVida(tempoExtra)
+    carregarParagrafo()
+    iniciarContagemRegressiva()
+  }
+}
+
+// Reiniciar
+const reiniciarJogo = () => {
+  carregarParagrafo()
+  estadoJogo.definir(estadoInicial())
+  campoEntrada.value = ""
+  tempoTag.innerText = tempoMaximo
+  lpmTag.innerText = 0
+  errosTag.innerText = 0
+  cpmTag.innerText = 0
+  atualizarBarraDeVida(tempoMaximo)
+}
+
+// Carregar o primeiro parágrafo
+const carregarParagrafo = () => {
+  const paragrafo = obterParagrafoAleatorio()
+  textoDigitando.innerHTML = envolverCaracteres(paragrafo)
+  ativarCaractere(0)
+  definirFoco()
+}
+
+// Início do jogo
+carregarParagrafo()
+campoEntrada.addEventListener("input", iniciarDigitacao)
+botaoTentarNovamente.addEventListener("click", reiniciarJogo)

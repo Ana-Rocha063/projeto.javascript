@@ -1,3 +1,7 @@
-const paragraphs = [
-    "Numa jornada pela vida, muitas vezes nos encontramos em encruzilhadas, duvidando dos nossos passos e da direção a seguir. Mas é precisamente nesses momentos que reside a maior oportunidade de crescimento. Lembre-se de que cada desafio é um convite para descobrir uma força interior que você nem sabia que possuía.Acredite no poder da sua resiliência. Assim como a natureza encontra sempre um caminho para florescer, mesmo nas condições mais adversas, você também tem a capacidade de se adaptar, de aprender e de se erguer novamente, mais forte do que antes. Não se prenda ao medo do fracasso, pois ele é apenas um degrau no caminho para o sucesso. Cada erro, cada tropeço, é uma lição valiosa que molda quem você é e quem você se tornará"
-]
+const paragrafos = [
+  "A prática leva à perfeição.",
+  "Desenvolver com JavaScript é divertido e desafiador.",
+  "Digitar rapidamente é uma habilidade útil em muitas profissões.",
+  "Cada letra digitada corretamente conta pontos a seu favor.",
+  "Respire fundo e mantenha o foco durante a digitação."
+];
