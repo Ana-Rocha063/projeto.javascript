@@ -8,20 +8,33 @@ body, html {
   height: 500px;
   margin: 0;
   padding: 0;
-  background: #5CA4EA;
+  background: #17A2B8;
   overflow: hidden;
   font-family: 'Lato', sans-serif;
 }
 
-.botao {
-  width: 400px;
-  height: 400px;
+.botao button {
+  background-color: #ff7433;  /* Cor de fundo do botão */
+  color: white;               /* Cor do texto */
+  border: none;               /* Remove a borda padrão do botão */
+  padding: 15px 30px;         /* Espaçamento interno (top/bottom e left/right) */
+  font-size: 24px;            /* Tamanho da fonte */
+  border-radius: 10px;        /* Arredonda os cantos do botão */
+  cursor: pointer;            /* Mostra uma mãozinha ao passar o mouse */
+  transition: background-color 0.3s;  /* Animação suave ao mudar de cor */
   position: absolute;
-  left: 50%;
+  margin-top: 100px;
   top: 50%;
+  left: 50%;
   transform: translate(-50%, -50%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
+.botao button:hover {
+  background-color: #080b3b;  /* Cor quando o mouse está sobre o botão */
+}
+
+
+.container{
+  color: aliceblue;
+  font-size: 25px ;
+}
