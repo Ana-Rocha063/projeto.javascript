@@ -4,19 +4,19 @@ const textoDigitando = document.querySelector(".typing-text p")
 // campoEntrada seleciona o campo onde o texto será escrito para interagir com o script
 const campoEntrada = document.querySelector(".wrapper .input-field")
 
-// Seletores dos elementos visuais de estatísticas
+// botaoTentarNovamente seleciona o botão try again, referente à começar uma nova tentativa. 
 const botaoTentarNovamente = document.querySelector(".content button")
 
-
+// tempoTag seleciona o elemento do tempo para interagir com o script
 const tempoTag = document.querySelector(".time span b")
 
-
+// errosTag seleciona o elemento de erros para interagir com o script
 const errosTag = document.querySelector(".mistake span")
 
-
+// lpmTag seleciona o elemento de LPM para interagir com o script
 const lpmTag = document.querySelector(".wpm span")
 
-
+// cpmTag seleciona o elemento de CPM para interagir com o script
 const cpmTag = document.querySelector(".cpm span")
 
 // Tempo máximo para o jogo (120 segundos)
