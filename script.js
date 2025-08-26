@@ -4,19 +4,19 @@ const textoDigitando = document.querySelector(".typing-text p")
 // campoEntrada seleciona o campo onde o texto será escrito para interagir com o script
 const campoEntrada = document.querySelector(".wrapper .input-field")
 
-// botaoTentarNovamente seleciona o botão try again, referente à começar uma nova tentativa. 
+// Seletores dos elementos visuais de estatísticas
 const botaoTentarNovamente = document.querySelector(".content button")
 
-// tempoTag seleciona o elemento do tempo para interagir com o script
+
 const tempoTag = document.querySelector(".time span b")
 
-// errosTag seleciona o elemento de erros para interagir com o script
+
 const errosTag = document.querySelector(".mistake span")
 
-// lpmTag seleciona o elemento de LPM para interagir com o script
+
 const lpmTag = document.querySelector(".wpm span")
 
-// cpmTag seleciona o elemento de CPM para interagir com o script
+
 const cpmTag = document.querySelector(".cpm span")
 
 // Tempo máximo para o jogo (120 segundos)
@@ -94,6 +94,15 @@ const iniciarContagemRegressiva = () => {
   } else {
     campoEntrada.value = ""
     atualizarBarraDeVida(0)
+    conteudojogo.innerHTML = `
+            <div style="text-align: center; margin-top: 50px;">
+                <h1>Fim de Jogo!</h1>
+                <p>O tempo acabou. Tente novamente.</p>
+                <button onclick="history.back()" style="background-color: #4CAF50; color: white; border: none; border-radius: 5px; padding: 10px 20px; font-size: 16px; cursor: pointer; transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;" onmouseover="this.style.backgroundColor='#45a049'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='#4CAF50'; this.style.transform='scale(1)';">Reiniciar</button>
+            </div>
+        `; 
+
+
   }
 }
 
@@ -193,3 +202,5 @@ const carregarParagrafo = () => {
 carregarParagrafo()
 campoEntrada.addEventListener("input", iniciarDigitacao)
 botaoTentarNovamente.addEventListener("click", reiniciarJogo)
+
+

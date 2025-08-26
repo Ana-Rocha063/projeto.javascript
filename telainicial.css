@@ -8,9 +8,19 @@ body, html {
   height: 500px;
   margin: 0;
   padding: 0;
-  background: #17A2B8;
+  background: #0080ff;
   overflow: hidden;
   font-family: 'Lato', sans-serif;
+}
+
+.nome-amarelo {
+    color: yellow; /* ou use um código hexadecimal para um amarelo específico, como #FFD700 */
+}
+
+/* Opcional: Se quiser dar mais estilo ao título */
+.titulo-jogo {
+    font-size: 4em;
+    color: white; /* Exemplo: o restante do texto é branco */
 }
 
 .botao button {

@@ -1,4 +1,3 @@
-// Fonte de armazenamento de frases relacionadas ao jogo de digitação
 const paragrafos = [
   "A prática leva à perfeição.",
   "Desenvolver com JavaScript é divertido e desafiador.",
