@@ -162,7 +162,8 @@ const iniciarDigitacao = () => {
 
   // Se a frase acabou
   if (novoEstado.indiceChar >= caracteres.length) {
-    const tempoExtra = Math.min(novoEstado.tempoRestante + 5, tempoMaximo)
+    if (novoEstado.erros === 0) {
+      const tempoExtra = Math.min(novoEstado.tempoRestante + 5, tempoMaximo)
 
     estadoJogo.definir({
       ...estadoInicial(),
@@ -175,8 +176,20 @@ const iniciarDigitacao = () => {
     atualizarBarraDeVida(tempoExtra)
     carregarParagrafo()
     iniciarContagemRegressiva()
+    return
+  } else {
+    campoEntrada.classList.add("sacudir")
+
+    // Remove a classe depois da animação para poder usar de novo
+    campoEntrada.addEventListener("fimAnimacao", () => {
+      campoEntrada.classList.remove("sacudir")
+    }, { once: true }) // Faz isso só uma vez
+
+    return
   }
 }
+}
+
 
 // Reiniciar
 const reiniciarJogo = () => {
