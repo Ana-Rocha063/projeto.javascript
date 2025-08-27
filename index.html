@@ -1,17 +1,41 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tela Inicial Jogo</title>
-    <link rel="stylesheet" href="telainicial.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tela Inicial Jogo</title>
+  <link rel="stylesheet" href="telainicial.css" />
 </head>
 <body>
-    <div class="container">
-       <h1 class="titulo-jogo">Di<span class="nome-amarelo">GIT</span> Master</h1>
-        <h2>Clique abaixo para Jogar</h2>
+  <div class="container">
+    <h1 class="titulo-jogo">Di<span class="nome-amarelo">GIT</span> Master</h1>
+    
+    <h2>Clique abaixo para Jogar</h2>
+
+    <div class="botao">
+      <button onclick="iniciarJogo()">JOGAR</button>
     </div>
-<div class="botao">
-    <button><a onclick="window.location.href='jogo.html'">JOGAR</a></button>
-</div>
+
+    <div class="nome-campo">
+      <label for="nomeJogador">Seu nome:</label><br>
+      <input 
+        type="text" 
+        id="nomeJogador" 
+        placeholder="Digite seu nome" 
+      />
+    </div>
+  </div>
+
+  <script>
+    function iniciarJogo() {
+      const nome = document.getElementById("nomeJogador").value.trim();
+      if (!nome) {
+        alert("Por favor, digite seu nome antes de jogar!");
+        return;
+      }
+      localStorage.setItem("nomeDoJogador", nome);
+      window.location.href = "jogo.html";
+    }
+  </script>
 </body>
+</html>

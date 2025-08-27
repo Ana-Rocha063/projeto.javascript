@@ -92,18 +92,37 @@ const iniciarContagemRegressiva = () => {
 
     setTimeout(iniciarContagemRegressiva, 1000)
   } else {
-    campoEntrada.value = ""
-    atualizarBarraDeVida(0)
-    conteudojogo.innerHTML = `
-            <div style="text-align: center; margin-top: 50px;">
-                <h1>Fim de Jogo!</h1>
-                <p>O tempo acabou. Tente novamente.</p>
-                <button onclick="history.back()" style="background-color: #4CAF50; color: white; border: none; border-radius: 5px; padding: 10px 20px; font-size: 16px; cursor: pointer; transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;" onmouseover="this.style.backgroundColor='#45a049'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='#4CAF50'; this.style.transform='scale(1)';">Reiniciar</button>
-            </div>
-        `; 
+  campoEntrada.value = ""
+  atualizarBarraDeVida(0)
 
+  // Função para salvar a pontuação com nome do jogador
+  const salvarPontuacao = () => {
+    // Pega o nome do jogador do localStorage, ou usa "Anônimo" caso vazio
+    const nome = localStorage.getItem("nomeDoJogador") || "Anônimo"
 
+    const pontuacoes = JSON.parse(localStorage.getItem("rankingPontuacoes") || "[]")
+
+    const novaPontuacao = {
+      nome,
+      lpm: parseInt(lpmTag.innerText),
+      cpm: parseInt(cpmTag.innerText),
+      erros: parseInt(errosTag.innerText),
+      tempo: estado.tempoRestante,
+      fases: Math.floor(parseInt(cpmTag.innerText) / 5),
+      data: new Date().toLocaleString("pt-BR")
+    }
+
+    // Ordena do melhor LPM para o pior e guarda só os top 5
+    const rankingAtualizado = [...pontuacoes, novaPontuacao]
+      .sort((a, b) => b.lpm - a.lpm)
+      .slice(0, 5)
+
+    localStorage.setItem("rankingPontuacoes", JSON.stringify(rankingAtualizado))
   }
+
+  salvarPontuacao()
+  window.location.href = "gameover.html" // redireciona para a tela de fim
+}
 }
 
 // Aplica estilo correto/incorreto
@@ -149,32 +168,39 @@ const iniciarDigitacao = () => {
   if (!letraDigitada) {
     const novoEstado = tratarBackspace(estado, caracteres)
     estadoJogo.definir(novoEstado)
-  } else {
+  } else if (estado.indiceChar < caracteres.length) {
     const novosErros = estado.erros + atualizarClasses(estado.indiceChar, letraDigitada, caracteres)
     const novoIndice = estado.indiceChar + 1
     estadoJogo.definir({ indiceChar: novoIndice, erros: novosErros })
   }
-
+ 
   const novoEstado = estadoJogo.obter()
 
   ativarCaractere(novoEstado.indiceChar)
   atualizarEstatisticas(novoEstado.indiceChar, novoEstado.erros, novoEstado.tempoRestante)
 
-  // Se a frase acabou
+    // Se a frase acabou
   if (novoEstado.indiceChar >= caracteres.length) {
-    const tempoExtra = Math.min(novoEstado.tempoRestante + 5, tempoMaximo)
+    if (novoEstado.erros === 0) {
+      const tempoExtra = Math.min(novoEstado.tempoRestante + 5, tempoMaximo)
 
-    estadoJogo.definir({
-      ...estadoInicial(),
-      tempoRestante: tempoExtra,
-      digitando: true
-    })
+      estadoJogo.definir({
+        ...estadoInicial(),
+        tempoRestante: tempoExtra,
+        digitando: true
+      })
 
-    campoEntrada.value = ""
-    tempoTag.innerText = tempoExtra
-    atualizarBarraDeVida(tempoExtra)
-    carregarParagrafo()
-    iniciarContagemRegressiva()
+      campoEntrada.value = ""
+      tempoTag.innerText = tempoExtra
+      atualizarBarraDeVida(tempoExtra)
+      carregarParagrafo()
+      iniciarContagemRegressiva()
+    } else {
+      campoEntrada.classList.add("sacudir")
+      setTimeout(() => {
+        campoEntrada.classList.remove("sacudir")
+      }, 300)
+    }
   }
 }
 
