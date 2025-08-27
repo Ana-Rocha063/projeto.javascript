@@ -149,47 +149,41 @@ const iniciarDigitacao = () => {
   if (!letraDigitada) {
     const novoEstado = tratarBackspace(estado, caracteres)
     estadoJogo.definir(novoEstado)
-  } else {
+  } else if (estado.indiceChar < caracteres.length) {
     const novosErros = estado.erros + atualizarClasses(estado.indiceChar, letraDigitada, caracteres)
     const novoIndice = estado.indiceChar + 1
     estadoJogo.definir({ indiceChar: novoIndice, erros: novosErros })
   }
-
+ 
   const novoEstado = estadoJogo.obter()
 
   ativarCaractere(novoEstado.indiceChar)
   atualizarEstatisticas(novoEstado.indiceChar, novoEstado.erros, novoEstado.tempoRestante)
 
-  // Se a frase acabou
+    // Se a frase acabou
   if (novoEstado.indiceChar >= caracteres.length) {
     if (novoEstado.erros === 0) {
       const tempoExtra = Math.min(novoEstado.tempoRestante + 5, tempoMaximo)
 
-    estadoJogo.definir({
-      ...estadoInicial(),
-      tempoRestante: tempoExtra,
-      digitando: true
-    })
+      estadoJogo.definir({
+        ...estadoInicial(),
+        tempoRestante: tempoExtra,
+        digitando: true
+      })
 
-    campoEntrada.value = ""
-    tempoTag.innerText = tempoExtra
-    atualizarBarraDeVida(tempoExtra)
-    carregarParagrafo()
-    iniciarContagemRegressiva()
-    return
-  } else {
-    campoEntrada.classList.add("sacudir")
-
-    // Remove a classe depois da animação para poder usar de novo
-    campoEntrada.addEventListener("fimAnimacao", () => {
-      campoEntrada.classList.remove("sacudir")
-    }, { once: true }) // Faz isso só uma vez
-
-    return
+      campoEntrada.value = ""
+      tempoTag.innerText = tempoExtra
+      atualizarBarraDeVida(tempoExtra)
+      carregarParagrafo()
+      iniciarContagemRegressiva()
+    } else {
+      campoEntrada.classList.add("sacudir")
+      setTimeout(() => {
+        campoEntrada.classList.remove("sacudir")
+      }, 300)
+    }
   }
 }
-}
-
 
 // Reiniciar
 const reiniciarJogo = () => {
