@@ -1,17 +1,59 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fim de Jogo</title>
-    <link rel="stylesheet" href="gameover.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fim de Jogo</title>
+  <link rel="stylesheet" href="gameover.css" />
 </head>
 <body>
 
-    <div class="game-over-container">
-        <h1 class="game-over-text">Tempo Esgotado</h1>
-        <button class="restart-button">Jogar Novamente</button>
-    </div>
+  <div class="game-over-container">
+    <h1 class="game-over-text">Tempo Esgotado</h1>
+    <button class="restart-button" onclick="voltar()">Jogar Novamente</button>
+
+    <div id="resumo-atual" style="margin-top: 25px; font-size: 1.1em;"></div>
+
+    <h2 style="margin-top: 30px;">Top 5 Pontuações</h2>
+    <ul id="ranking-list" style="list-style: none; padding: 0; margin-top: 15px;"></ul>
+  </div>
+
+  <script>
+    const voltar = () => {
+      window.location.href = "index.html" // ou sua página de jogo
+    }
+
+    const carregarRanking = () => {
+      const ranking = JSON.parse(localStorage.getItem("rankingPontuacoes") || "[]")
+      const lista = document.getElementById("ranking-list")
+      const resumo = document.getElementById("resumo-atual")
+
+      if (ranking.length === 0) {
+        lista.innerHTML = "<li>Nenhuma pontuação registrada ainda 😅</li>"
+        return
+      }
+
+      const ultima = ranking[0]
+
+      resumo.innerHTML = `
+        <p><strong>${ultima.nome}</strong>, você acertou <strong>${ultima.palavras}</strong> palavras nesta rodada.</p>
+      `
+
+      ranking.forEach((item, i) => {
+        const li = document.createElement("li")
+        li.innerHTML = `
+          <strong>#${i + 1}</strong> - ${item.nome} <br>
+          LPM: <b>${item.lpm}</b>, CPM: ${item.cpm}, Erros: ${item.erros}, 
+          Tempo restante: ${item.tempo}s 
+          <br><small style="opacity: 0.6;">(${item.data})</small>
+        `
+        li.style.marginBottom = "12px"
+        lista.appendChild(li)
+      })
+    }
+
+    carregarRanking()
+  </script>
 
 </body>
 </html>
