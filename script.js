@@ -20,8 +20,8 @@ const lpmTag = document.querySelector(".wpm span")
 const cpmTag = document.querySelector(".cpm span")
 
 // Tempo máximo para o jogo (120 segundos)
-const tempoMaximo = 120
-
+const tempoMaximo = 20
+let frasesCompletas = 0
 // Seleciona um parágrafo aleatório da lista 'paragrafos'
 const obterParagrafoAleatorio = () =>
   paragrafos[Math.floor(Math.random() * paragrafos.length)]
@@ -61,6 +61,7 @@ const estadoInicial = () => ({
   indiceChar: 0,
   erros: 0,
   digitando: false
+ 
 })
 
 // Encapsulamento funcional do estado
@@ -87,7 +88,7 @@ const iniciarContagemRegressiva = () => {
     estadoJogo.definir({ tempoRestante: novoTempo })
 
     tempoTag.innerText = novoTempo
-    atualizarEstatisticas(estado.indiceChar, estado.erros, novoTempo)
+    atualizarEstatisticas(estado.indiceChar, estado.erros, novoTempo, frasesCompletas)
     atualizarBarraDeVida(novoTempo)
 
     setTimeout(iniciarContagemRegressiva, 1000)
@@ -109,7 +110,9 @@ const iniciarContagemRegressiva = () => {
       erros: parseInt(errosTag.innerText),
       tempo: estado.tempoRestante,
       fases: Math.floor(parseInt(cpmTag.innerText) / 5),
+      frases: frasesCompletas, 
       data: new Date().toLocaleString("pt-BR")
+     
     }
 
     // Ordena do melhor LPM para o pior e guarda só os top 5
@@ -182,12 +185,14 @@ const iniciarDigitacao = () => {
     // Se a frase acabou
   if (novoEstado.indiceChar >= caracteres.length) {
     if (novoEstado.erros === 0) {
+      frasesCompletas= frasesCompletas + 1
       const tempoExtra = Math.min(novoEstado.tempoRestante + 5, tempoMaximo)
 
       estadoJogo.definir({
         ...estadoInicial(),
         tempoRestante: tempoExtra,
         digitando: true
+        
       })
 
       campoEntrada.value = ""
