@@ -123,6 +123,9 @@ const salvarPontuacao = () => {
     .slice(0, 5)
 
   localStorage.setItem("rankingPontuacoes", JSON.stringify(rankingAtualizado))
+ 
+  // ✅ Salva também a última partida separada
+localStorage.setItem("ultimaPontuacao", JSON.stringify(novaPontuacao))
 }
   salvarPontuacao()
   window.location.href = "gameover.html" // redireciona para a tela de fim
