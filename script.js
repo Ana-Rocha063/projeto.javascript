@@ -60,8 +60,8 @@ const estadoInicial = () => ({
   tempoRestante: tempoMaximo,
   indiceChar: 0,
   erros: 0,
-  digitando: false
- 
+  digitando: false,
+  frasesCompletas: 0
 })
 
 // Encapsulamento funcional do estado
@@ -97,32 +97,33 @@ const iniciarContagemRegressiva = () => {
   atualizarBarraDeVida(0)
 
   // Função para salvar a pontuação com nome do jogador
-  const salvarPontuacao = () => {
-    // Pega o nome do jogador do localStorage, ou usa "Anônimo" caso vazio
-    const nome = localStorage.getItem("nomeDoJogador") || "Anônimo"
+const salvarPontuacao = () => {
+  // Pega o nome do jogador do localStorage, ou usa "Anônimo" caso vazio
+  const nome = localStorage.getItem("nomeDoJogador") || "Anônimo"
 
-    const pontuacoes = JSON.parse(localStorage.getItem("rankingPontuacoes") || "[]")
+  const pontuacoes = JSON.parse(localStorage.getItem("rankingPontuacoes") || "[]")
 
-    const novaPontuacao = {
-      nome,
-      lpm: parseInt(lpmTag.innerText),
-      cpm: parseInt(cpmTag.innerText),
-      erros: parseInt(errosTag.innerText),
-      tempo: estado.tempoRestante,
-      fases: Math.floor(parseInt(cpmTag.innerText) / 5),
-      frases: frasesCompletas, 
-      data: new Date().toLocaleString("pt-BR")
-     
-    }
+  // Pega o estado atual do jogo
+  const estado = estadoJogo.obter()
 
-    // Ordena do melhor LPM para o pior e guarda só os top 5
-    const rankingAtualizado = [...pontuacoes, novaPontuacao]
-      .sort((a, b) => b.lpm - a.lpm)
-      .slice(0, 5)
-
-    localStorage.setItem("rankingPontuacoes", JSON.stringify(rankingAtualizado))
+  const novaPontuacao = {
+    nome,
+    lpm: parseInt(lpmTag.innerText),
+    cpm: parseInt(cpmTag.innerText),
+    erros: parseInt(errosTag.innerText),
+    tempo: estado.tempoRestante,
+    fases: Math.floor(parseInt(cpmTag.innerText) / 5),
+    frases: estado.frasesCompletas,  // ✅ agora pega do estado centralizado
+    data: new Date().toLocaleString("pt-BR")
   }
 
+  // Ordena do melhor LPM para o pior e guarda só os top 5
+  const rankingAtualizado = [...pontuacoes, novaPontuacao]
+    .sort((a, b) => b.lpm - a.lpm)
+    .slice(0, 5)
+
+  localStorage.setItem("rankingPontuacoes", JSON.stringify(rankingAtualizado))
+}
   salvarPontuacao()
   window.location.href = "gameover.html" // redireciona para a tela de fim
 }
@@ -185,21 +186,21 @@ const iniciarDigitacao = () => {
     // Se a frase acabou
   if (novoEstado.indiceChar >= caracteres.length) {
     if (novoEstado.erros === 0) {
-      frasesCompletas= frasesCompletas + 1
-      const tempoExtra = Math.min(novoEstado.tempoRestante + 5, tempoMaximo)
+  const frasesFeitas = novoEstado.frasesCompletas + 1
+  const tempoExtra = Math.min(novoEstado.tempoRestante + 5, tempoMaximo)
 
-      estadoJogo.definir({
-        ...estadoInicial(),
-        tempoRestante: tempoExtra,
-        digitando: true
-        
-      })
+  estadoJogo.definir({
+    ...estadoInicial(),
+    tempoRestante: tempoExtra,
+    digitando: true,
+    frasesCompletas: frasesFeitas
+  })
 
-      campoEntrada.value = ""
-      tempoTag.innerText = tempoExtra
-      atualizarBarraDeVida(tempoExtra)
-      carregarParagrafo()
-      iniciarContagemRegressiva()
+  campoEntrada.value = ""
+  tempoTag.innerText = tempoExtra
+  atualizarBarraDeVida(tempoExtra)
+  carregarParagrafo()
+  iniciarContagemRegressiva()
     } else {
       campoEntrada.classList.add("sacudir")
       setTimeout(() => {
