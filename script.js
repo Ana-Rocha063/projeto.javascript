@@ -193,7 +193,7 @@ const iniciarDigitacao = () => {
     ...estadoInicial(),
     tempoRestante: tempoExtra,
     digitando: true,
-    frasesCompletas: frasesFeitas
+    frasesCompletas: frasesFeitas  // ✅ mantém a contagem acumulada
   })
 
   campoEntrada.value = ""
@@ -201,7 +201,7 @@ const iniciarDigitacao = () => {
   atualizarBarraDeVida(tempoExtra)
   carregarParagrafo()
   iniciarContagemRegressiva()
-    } else {
+} else {
       campoEntrada.classList.add("sacudir")
       setTimeout(() => {
         campoEntrada.classList.remove("sacudir")
