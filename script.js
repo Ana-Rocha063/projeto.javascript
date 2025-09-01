@@ -1,3 +1,7 @@
+//Todo o código foi criado e adaptado pelo jogo do vídeo https://youtu.be/Hg80AjDNnJk?si=XYdkr7F9sEAVD_WS
+// O código inteiro foi modificado, e poucas funções estavam de acordo com o paradigma funcional
+// como a que se encontra em paragraphs.js, de resto tudo alterado
+
 // textoDigitando seleciona o texto que deve ser digitado para interagir com o script
 const textoDigitando = document.querySelector(".typing-text p")
 
@@ -7,20 +11,20 @@ const campoEntrada = document.querySelector(".wrapper .input-field")
 // Seletores dos elementos visuais de estatísticas
 const botaoTentarNovamente = document.querySelector(".content button")
 
-
+//Contador de tempo
 const tempoTag = document.querySelector(".time span b")
 
-
+//Contador de erros
 const errosTag = document.querySelector(".mistake span")
 
-
+//Contador de Letras por minuto (lpm)
 const lpmTag = document.querySelector(".wpm span")
 
-
+//Contador de precisão
 const cpmTag = document.querySelector(".cpm span")
 
 // Tempo máximo para o jogo (120 segundos)
-const tempoMaximo = 20
+const tempoMaximo = 120
 let frasesCompletas = 0
 // Seleciona um parágrafo aleatório da lista 'paragrafos'
 const obterParagrafoAleatorio = () =>
@@ -28,15 +32,16 @@ const obterParagrafoAleatorio = () =>
 
 // Envolve cada caractere com <span>
 const envolverCaracteres = texto =>
-  texto.split("").map(letra => `<span>${letra}</span>`).join("")
+  texto.split("").map(letra => `<span>${letra}</span>`).join("") //Junta todos os strings cortados pelo split em uma uníca string
 
-// Garante que o campo de digitação esteja sempre focado
+// Garante que o campo de digitação esteja sempre focado, ou seja
+// pronto para receber texto
 const definirFoco = () => {
   document.addEventListener("keydown", () => campoEntrada.focus())
   textoDigitando.addEventListener("click", () => campoEntrada.focus())
 }
 
-// Define qual caractere está "ativo"
+// Define qual caractere está "ativo" 
 const ativarCaractere = (indice = 0) =>
   Array.from(textoDigitando.querySelectorAll("span")).forEach((span, i) =>
     span.classList.toggle("active", i === indice)
@@ -44,15 +49,18 @@ const ativarCaractere = (indice = 0) =>
 
 // Atualiza LPM, CPM e erros
 const atualizarEstatisticas = (indiceChar, erros, tempoRestante) => {
-  const lpmCalculado = tempoRestante < tempoMaximo
-    ? Math.round(((indiceChar - erros) / 5) / ((tempoMaximo - tempoRestante) / 60))
+  const lpmCalculado = tempoRestante < tempoMaximo // Garante que o lpm seja calculado somente quando o jogo começar
+    ? Math.round(((indiceChar - erros) / 5) / ((tempoMaximo - tempoRestante) / 60)) // Fórmula para calcular o lpm, caso o jogo não tenha começado
+                                                                                    // Ele define o tempo como 0
     : 0
 
-  const lpm = lpmCalculado > 0 && isFinite(lpmCalculado) ? lpmCalculado : 0
+  const lpm = lpmCalculado > 0 && isFinite(lpmCalculado) ? lpmCalculado : 0 //Sistema que valida se o lpm é um valor positivo e finito
+                                                                            //Tudo fora disso ele define como 0 
 
-  lpmTag.innerText = lpm
-  errosTag.innerText = erros
-  cpmTag.innerText = indiceChar - erros
+  lpmTag.innerText = lpm //Mostra o valor calculado de LPM na tela do jogo.
+  errosTag.innerText = erros // Mostra o valor calculado de erros na tela do jogo
+  cpmTag.innerText = indiceChar - erros //Mostra a quantidade de caracteres corretos na tela (precisão)
+                                        // Diminui a quantidade de caracteres pelos erros
 }
 
 // Estado inicial do jogo
@@ -83,18 +91,18 @@ const atualizarBarraDeVida = tempo => {
 const iniciarContagemRegressiva = () => {
   const estado = estadoJogo.obter()
 
-  if (estado.tempoRestante > 0) {
-    const novoTempo = estado.tempoRestante - 1
+  if (estado.tempoRestante > 0) { // A chamada do tempo só continua se o tempo for maior que 0 
+    const novoTempo = estado.tempoRestante - 1 
     estadoJogo.definir({ tempoRestante: novoTempo })
 
-    tempoTag.innerText = novoTempo
-    atualizarEstatisticas(estado.indiceChar, estado.erros, novoTempo, frasesCompletas)
+    tempoTag.innerText = novoTempo //Mostra o tempo visualmente na tela
+    atualizarEstatisticas(estado.indiceChar, estado.erros, novoTempo, frasesCompletas) //Atualiza as estatisticas em tempo real
     atualizarBarraDeVida(novoTempo)
 
-    setTimeout(iniciarContagemRegressiva, 1000)
+    setTimeout(iniciarContagemRegressiva, 1000) // \Chama a função novamente a cada 1000 milissegundos
   } else {
-  campoEntrada.value = ""
-  atualizarBarraDeVida(0)
+  campoEntrada.value = "" //Limpa o campo de texto onde o jogador estava digitando.
+  atualizarBarraDeVida(0) //Garante que a barra de vida fique zerada
 
   // Função para salvar a pontuação com nome do jogador
 const salvarPontuacao = () => {
@@ -108,18 +116,18 @@ const salvarPontuacao = () => {
 
   const novaPontuacao = {
     nome,
-    lpm: parseInt(lpmTag.innerText),
+    lpm: parseInt(lpmTag.innerText), //A parse int serve para transformar as strings coletadas em inteiros
     cpm: parseInt(cpmTag.innerText),
     erros: parseInt(errosTag.innerText),
     tempo: estado.tempoRestante,
-    fases: Math.floor(parseInt(cpmTag.innerText) / 5),
-    frases: estado.frasesCompletas,  // ✅ agora pega do estado centralizado
+    fases: Math.floor(parseInt(cpmTag.innerText) / 5), //Calcula de forma mediana a quantidade de frases completadas 
+    frases: estado.frasesCompletas,  //  agora pega do estado centralizado
     data: new Date().toLocaleString("pt-BR")
   }
 
   // Ordena do melhor LPM para o pior e guarda só os top 5
   const rankingAtualizado = [...pontuacoes, novaPontuacao]
-    .sort((a, b) => b.lpm - a.lpm)
+    .sort((a, b) => b.lpm - a.lpm) //
     .slice(0, 5)
 
   localStorage.setItem("rankingPontuacoes", JSON.stringify(rankingAtualizado))
@@ -129,7 +137,8 @@ const salvarPontuacao = () => {
 }
 }
 
-// Aplica estilo correto/incorreto
+// Aplica estilo correto/incorreto se a letra digitada for ou não correspondente
+// a letra do texto
 const atualizarClasses = (indice, letraDigitada, caracteres) => {
   const caractereAtual = caracteres[indice]
   const correto = caractereAtual?.innerText === letraDigitada
@@ -142,40 +151,43 @@ const atualizarClasses = (indice, letraDigitada, caracteres) => {
 
 // Lida com backspace
 const tratarBackspace = (estado, caracteres) => {
-  const indiceAnterior = estado.indiceChar - 1
-  const anterior = caracteres[indiceAnterior]
+  const indiceAnterior = estado.indiceChar - 1 //Procura o indice da letra atual e volta 1 caractere pra trás
+  const anterior = caracteres[indiceAnterior] // Pega o elemento html que representa o caractere anterior
 
-  if (!anterior) return { ...estado }
+  if (!anterior) return { ...estado } //Se não houver caractere anterior a função retrona o estado sem nenhuma alteração
 
-  const estavaErrado = anterior.classList.contains("incorrect")
+  const estavaErrado = anterior.classList.contains("incorrect") //Verifica se o caractere anterior estava marcado como incorreto
 
-  anterior.classList.remove("correct", "incorrect")
+  anterior.classList.remove("correct", "incorrect") //Ao voltar para a letra anterior remove a classe correta ou incorreta da letra
 
   return {
     ...estado,
     indiceChar: indiceAnterior,
-    erros: estado.erros - (estavaErrado ? 1 : 0)
+    erros: estado.erros - (estavaErrado ? 1 : 0) // Se a letra anterior estava marcada como errada ele diminui 1, senão 0
   }
 }
 
 // Quando digita algo
 const iniciarDigitacao = () => {
-  const caracteres = Array.from(textoDigitando.querySelectorAll("span"))
-  const estado = estadoJogo.obter()
+  const caracteres = Array.from(textoDigitando.querySelectorAll("span")) //Transfroma todos os spans em uma lista
+  const estado = estadoJogo.obter() // se está digitando, qual caractere está, quantos erros, etc.).
   const letraDigitada = campoEntrada.value.charAt(estado.indiceChar)
 
   if (!estado.digitando) {
     estadoJogo.definir({ digitando: true })
-    iniciarContagemRegressiva()
+    iniciarContagemRegressiva() // Chama a função que inicia a contagem regressiva
   }
 
-  if (!letraDigitada) {
-    const novoEstado = tratarBackspace(estado, caracteres)
+  if (!letraDigitada) {  //Se o jogador não digitou nada ou seja, se a tecla pressionada foi Backspace ou Delete)
+    const novoEstado = tratarBackspace(estado, caracteres)//Chama a função para lidar com a tecla Backspace
     estadoJogo.definir(novoEstado)
-  } else if (estado.indiceChar < caracteres.length) {
-    const novosErros = estado.erros + atualizarClasses(estado.indiceChar, letraDigitada, caracteres)
-    const novoIndice = estado.indiceChar + 1
-    estadoJogo.definir({ indiceChar: novoIndice, erros: novosErros })
+  } else if (estado.indiceChar < caracteres.length) { //Se o jogador digitou um caractere e ainda não chegou ao final do texto.
+    const novosErros = estado.erros + atualizarClasses(estado.indiceChar, letraDigitada, caracteres) //Chama a função atualizarClasses, que verifica se a letra digitada está correta ou errada, e adiciona a classe CSS correspondente.
+                                                                                                     //  A função também retorna 1 se a letra estiver errada e 0 se estiver correta, atualizando a contagem de erros.
+    const novoIndice = estado.indiceChar + 1 // Move o para o indice do caractere seguinte
+    estadoJogo.definir({ indiceChar: novoIndice, erros: novosErros }) //Salva o novo índice do cursor e a nova contagem de erros no estado do jogo.
+
+
   }
  
   const novoEstado = estadoJogo.obter()
@@ -184,25 +196,25 @@ const iniciarDigitacao = () => {
   atualizarEstatisticas(novoEstado.indiceChar, novoEstado.erros, novoEstado.tempoRestante)
 
     // Se a frase acabou
-  if (novoEstado.indiceChar >= caracteres.length) {
+  if (novoEstado.indiceChar >= caracteres.length) { //Confere se os erros estão zerados e o indice do cacactere ultrapassou a frase
     if (novoEstado.erros === 0) {
-  const frasesFeitas = novoEstado.frasesCompletas + 1
-  const tempoExtra = Math.min(novoEstado.tempoRestante + 5, tempoMaximo)
+  const frasesFeitas = novoEstado.frasesCompletas + 1 //Salva a informação dde mais uma frase
+  const tempoExtra = Math.min(novoEstado.tempoRestante + 20, tempoMaximo) //Acrescenta +20 segundos à vida
 
-  estadoJogo.definir({
+  estadoJogo.definir({  // Atualiza as estatisticas novamente para a nova frase
     ...estadoInicial(),
     tempoRestante: tempoExtra,
     digitando: true,
     frasesCompletas: frasesFeitas
   })
 
-  campoEntrada.value = ""
+  campoEntrada.value = ""         //Chama todas as funções novamente e limpa o campo de entrada
   tempoTag.innerText = tempoExtra
   atualizarBarraDeVida(tempoExtra)
   carregarParagrafo()
   iniciarContagemRegressiva()
     } else {
-      campoEntrada.classList.add("sacudir")
+      campoEntrada.classList.add("sacudir") //Animação de tremor como se estivesse errado
       setTimeout(() => {
         campoEntrada.classList.remove("sacudir")
       }, 300)
@@ -210,11 +222,11 @@ const iniciarDigitacao = () => {
   }
 }
 
-// Reiniciar
+// Reiniciar o jogo, zerando todas as estatisticas
 const reiniciarJogo = () => {
   carregarParagrafo()
-  estadoJogo.definir(estadoInicial())
-  campoEntrada.value = ""
+  estadoJogo.definir(estadoInicial()) //Define o jogo para o estado inicial 
+  campoEntrada.value = "" // O resto dos códigos apenas reinicia todos os atributos do jogo
   tempoTag.innerText = tempoMaximo
   lpmTag.innerText = 0
   errosTag.innerText = 0
