@@ -130,7 +130,10 @@ const salvarPontuacao = () => {
     .sort((a, b) => b.lpm - a.lpm) //
     .slice(0, 5)
 
-  localStorage.setItem("rankingPontuacoes", JSON.stringify(rankingAtualizado))
+ 
+ 
+  // ✅ Salva também a última partida separada
+localStorage.setItem("ultimaPontuacao", JSON.stringify(novaPontuacao))
 }
   salvarPontuacao()
   window.location.href = "gameover.html" // redireciona para a tela de fim
@@ -205,7 +208,7 @@ const iniciarDigitacao = () => {
     ...estadoInicial(),
     tempoRestante: tempoExtra,
     digitando: true,
-    frasesCompletas: frasesFeitas
+    frasesCompletas: frasesFeitas  // ✅ mantém a contagem acumulada
   })
 
   campoEntrada.value = ""         //Chama todas as funções novamente e limpa o campo de entrada

@@ -33,12 +33,15 @@
         return
       }
 
-      const ultima = ranking[0]
+    const ultima = JSON.parse(localStorage.getItem("ultimaPontuacao"))
 
-      resumo.innerHTML = `
-        <p><strong>${ultima.nome}</strong>, você completou <strong>${ultima.frases}</strong> frases nesta rodada.</p>
-      `
-
+if (ultima) {
+  resumo.innerHTML = `
+    <p><strong>${ultima.nome}</strong>, você completou <strong>${ultima.frases}</strong> 
+    ${ultima.frases === 1 ? "frase" : "frases"} nesta rodada.</p>
+  `
+}
+      // Ordena por LPM decrescente
       ranking.forEach((item, i) => {
         const li = document.createElement("li")
         li.innerHTML = `
